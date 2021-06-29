@@ -1,14 +1,17 @@
-const express = require('express')
+require("dotenv").config();
+const express = require("express");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const app = express();
+const mainRouter = require("./src/routes/index");
 
-const app = express()
-
-app.get('/', (req, res) => {
-  return res.json({
-    success: true,
-    message: "Backend is Running Well"
-  })
-})
+app.use(cors());
+app.use(bodyParser.urlencoded({extended: false}));
 
 app.listen(8080, () => {
-  console.log("App Running on Port 8080")
-})
+	console.log("App Running on Port 8080");
+});
+
+app.use("/", mainRouter);
+
+module.exports = app;
