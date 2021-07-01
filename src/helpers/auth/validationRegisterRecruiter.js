@@ -14,7 +14,7 @@ module.exports = {
 			errorMessage: "Email is Required",
 		},
 	},
-	company: {
+	company_name: {
 		isLength: {
 			errorMessage: "Company length must be greater than 6",
 			options: {
@@ -24,9 +24,9 @@ module.exports = {
 	},
 	position: {
 		isLength: {
-			errorMessage: "Position length must be greater than 6",
+			errorMessage: "Position length must be greater than 3",
 			options: {
-				min: 6,
+				min: 3,
 			},
 		},
 	},
