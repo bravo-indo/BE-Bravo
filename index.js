@@ -9,10 +9,13 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 
 const authRouter = require("./src/routes/auth");
+const userRouter = require("./src/routes/user");
 
-// const auth = require("./src/middlewares/auth");
+
+const auth = require("./src/middlewares/auth");
 
 app.use("/auth", authRouter);
+app.use("/user", auth, userRouter);
 
 
 app.listen(8080, () => {
