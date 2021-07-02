@@ -9,14 +9,14 @@ app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
 
 const authRouter = require("./src/routes/auth");
+
+const skillRouter = require("./src/routes/skills");
 const userRouter = require("./src/routes/user");
-
-
 const auth = require("./src/middlewares/auth");
 
 app.use("/auth", authRouter);
+app.use("/skill", skillRouter);
 app.use("/user", auth, userRouter);
-
 
 app.listen(8080, () => {
 	console.log("App Running on Port 8080");
