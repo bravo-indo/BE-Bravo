@@ -3,10 +3,12 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const app = express();
+const { APP_UPLOAD_ROUTE, APP_UPLOAD_PATH } = process.env;
 // const mainRouter = require("./src/routes/index");
 
 app.use(cors());
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(APP_UPLOAD_ROUTE, express.static(APP_UPLOAD_PATH));
 
 const authRouter = require("./src/routes/auth");
 

@@ -21,6 +21,13 @@ exports.searchUserBySkill = (cond, cb) => {
 	`, [cond], cb);
 };
 
+exports.getUserWorkerByEmail = (email, cb) => {
+	connection.query(
+		`SELECT id, name, email, password FROM ${table}
+  WHERE email= ?`,
+		[email], cb);
+};
+
 exports.getUserWorkerDetail = (id, cb) => {
 	connection.query(
 		`SELECT ${table}.id, ${table}.images, ${table}.name, ${table}.job_desk, ${table}.address, ${table}.working_time, ${table}.description, skills.name as skills, ${table}.instagram, ${table}.github, ${table}.gitlab
@@ -47,6 +54,23 @@ exports.getExperienceUser = (id, cb) => {
 	WHERE ${table}.id=?
 	`, [id], cb);
 };
+
+exports.getUserWorkerById = (id, cb) =>{
+	connection.query(`
+  SELECT name, images, job_desk, address, company_name, description
+  FROM ${table}
+  WHERE id=?
+  `,[id], cb);
+};
+
+
+exports.UpdateUserWorker = (data, cb) => {
+	connection.query(` 
+  UPDATE ${table} SET name=?, images=?, job_desk=?, address=?, company_name=?, description=?, updated_time=?
+  WHERE id=?
+  `,[data.name, data.images, data.job_desk, data.address, data.company_name, data.description, data.updated_time, data.id], cb);
+};
+
 
 // Recruiter
 exports.createUserRecruiter = (data, cb) => {

@@ -3,6 +3,7 @@ const userModel = require("../models/users");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const timeHelper = require("../helpers/date");
 const { APP_SECRET_KEY} = process.env;
 
 
@@ -87,13 +88,17 @@ exports.getDetailUserWorker = (req, res) =>{
 			console.log(err);
 			return response(res, 400, false, "you don't have permission to accsess this resorce");
 		}else{
+			const users = results[0];
+			if (users.images !== null && !users.images.startsWith("http")) {
+				users.images = `${process.env.APP_URL}${users.images}`;
+			}
 			const data = {
 				id: 0,
 				name: "",
 				job_desk: "",
 				address: "",
 				working_time: "",
-				user_description: "",
+				description: "",
 				...results[0],
 				skills: [],
 			};
@@ -123,6 +128,40 @@ exports.getExperienceByUser = (req, res) => {
 			return response(res, 400, false, "You dont have permission to access this resource");
 		}else{
 			return response(res, 200, true, "List Your experience", results);
+		}
+	});
+};
+
+const userPicture = require("../helpers/upload").single("images");
+
+exports.updateUserProfile = (req, res) => {
+	userModel.getUserWorkerById(req.authUser.id, (err, results) => {
+		if(err){
+			return response(res, 402, false, "You dont have permission to accsess this resource");
+		}else{
+			if(results.length <= 0){
+				return response(res, 402, false, "Ann Error Occured");
+			}else{
+				userPicture(req, res, err =>{
+					if(err){
+						console.log(err);
+						return response(res, 402, false, "Ann Error Occured on uploads image");
+					}else{
+						req.body.images = req.file ? `${process.env.APP_UPLOAD_ROUTE}/${req.file.filename}` : null;
+						const {name, images, job_desk, address, company_name, description} = req.body;
+						const data = { id: req.authUser.id, name, images, job_desk, address, company_name, description, updated_time: timeHelper.date()};
+						userModel.UpdateUserWorker(data, (err, results) => {
+							if (err) {
+								console.log(err);
+								return response(res, 500, false, "an Error accurred");
+							} else {
+								console.log(req.body);
+								return response(res, 200, true, "Profile Updated Sucsessfully", data);
+							}
+						});
+					}
+				});
+			}
 		}
 	});
 };
