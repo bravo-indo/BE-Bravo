@@ -6,9 +6,9 @@ const exp = "working_experience";
 // Worker
 exports.createUserWorker = (data, cb) => {
 	connection.query(
-		`INSERT INTO ${table} (name, email, phone_number, password)
-    VALUES(?, ?, ?, ?)`
-		, [data.name, data.email, data.phone_number, data.password], cb);
+		`INSERT INTO ${table} (role_users, type_users, name, email, phone_number, password)
+    VALUES(?, ?, ?, ?, ?, ?)`
+		, [data.role_users="general" ,data.type_users="worker", data.name, data.email, data.phone_number, data.password], cb);
 };
 
 exports.searchUserBySkill = (cond, cb) => {
@@ -19,6 +19,13 @@ exports.searchUserBySkill = (cond, cb) => {
 	WHERE skills.name LIKE '%${cond}%' 
 	GROUP BY NAME
 	`, [cond], cb);
+};
+
+exports.getUserWorkerByEmail = (email, cb) => {
+	connection.query(
+		`SELECT id, name, email, password FROM ${table}
+  WHERE email= ?`,
+		[email], cb);
 };
 
 exports.getUserWorkerDetail = (id, cb) => {
@@ -47,6 +54,23 @@ exports.getExperienceUser = (id, cb) => {
 	WHERE ${table}.id=?
 	`, [id], cb);
 };
+
+exports.getUserWorkerById = (id, cb) =>{
+	connection.query(`
+  SELECT name, images, job_desk, address, company_name, description
+  FROM ${table}
+  WHERE id=?
+  `,[id], cb);
+};
+
+
+exports.UpdateUserWorker = (data, cb) => {
+	connection.query(` 
+  UPDATE ${table} SET name=?, images=?, job_desk=?, address=?, company_name=?, description=?, updated_time=?
+  WHERE id=?
+  `,[data.name, data.images, data.job_desk, data.address, data.company_name, data.description, data.updated_time, data.id], cb);
+};
+
 
 // Recruiter
 exports.createUserRecruiter = (data, cb) => {
