@@ -95,6 +95,7 @@ exports.getDetailUserWorker = (req, res) =>{
 			const data = {
 				id: 0,
 				name: "",
+        type_users: "",
 				job_desk: "",
 				address: "",
 				working_time: "",
