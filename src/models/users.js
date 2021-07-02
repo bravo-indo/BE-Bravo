@@ -30,7 +30,7 @@ exports.getUserWorkerByEmail = (email, cb) => {
 
 exports.getUserWorkerDetail = (id, cb) => {
 	connection.query(
-		`SELECT ${table}.id, ${table}.images, ${table}.name,   ${table}.type_users, ${table}.job_desk, ${table}.address, ${table}.working_time, ${table}.description, skills.name as skills, ${table}.instagram, ${table}.github, ${table}.gitlab
+		`SELECT ${table}.id, ${table}.images, ${table}.name,   ${table}.type_users, ${table}.job_desk, ${table}.address, ${table}.working_time, ${table}.description, skills.name as skills, ${table}.email, ${table}.instagram, ${table}.github, ${table}.gitlab
     FROM ${table}
     LEFT JOIN skills ON ${table}.id = skills.id_user
     WHERE ${table}.id= ?`,
@@ -48,7 +48,7 @@ exports.getPortoFolioUser = (id, cb) => {
 
 exports.getExperienceUser = (id, cb) => {
 	connection.query(`
-	SELECT ${table}.id as user_id, ${exp}.id, ${exp}.company_name, ${exp}.position, ${exp}.years, ${exp}.description
+	SELECT ${table}.id as user_id, ${exp}.id, ${exp}.company_name, ${exp}.position, ${exp}.month_years, ${exp}.description
 	FROM ${table}
 	LEFT JOIN ${exp} ON ${table}.id = ${exp}.id_user
 	WHERE ${table}.id=?
@@ -57,7 +57,7 @@ exports.getExperienceUser = (id, cb) => {
 
 exports.getUserWorkerById = (id, cb) =>{
 	connection.query(`
-  SELECT name, images, job_desk, address, company_name, description
+  SELECT id, name, images, type_users, job_desk, address, company_name, description
   FROM ${table}
   WHERE id=?
   `,[id], cb);
@@ -71,6 +71,20 @@ exports.UpdateUserWorker = (data, cb) => {
   `,[data.name, data.images, data.job_desk, data.address, data.company_name, data.description, data.updated_time, data.id], cb);
 };
 
+const porto = "portofolios"
+exports.postUserWorkerPortofolio = (data, cb) => {
+  connection.query(`
+  INSERT INTO ${porto} ( id_user, project_name, repository, type_project, portofolio_file)
+  VALUES(?, ?, ?, ?, ?)
+  `, [data.id_user, data.project_name, data.repository, data.type_project, data.portofolio_file], cb)
+}
+
+exports.postUserWorkerExperience= (data, cb) => {
+  connection.query(`
+  INSERT INTO ${exp} ( id_user, company_name, position, month_years, description)
+  VALUES(?, ?, ?, ?, ?)
+  `, [data.id_user, data.company_name, data.position, data.month_years, data.description], cb)
+}
 
 // Recruiter
 exports.createUserRecruiter = (data, cb) => {
