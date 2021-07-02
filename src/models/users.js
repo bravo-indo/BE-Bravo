@@ -6,9 +6,9 @@ const exp = "working_experience";
 // Worker
 exports.createUserWorker = (data, cb) => {
 	connection.query(
-		`INSERT INTO ${table} (name, email, phone_number, password)
-    VALUES(?, ?, ?, ?)`
-		, [data.name, data.email, data.phone_number, data.password], cb);
+		`INSERT INTO ${table} (role_users, type_users, name, email, phone_number, password)
+    VALUES(?, ?, ?, ?, ?, ?)`
+		, [data.role_users="general" ,data.type_users="worker", data.name, data.email, data.phone_number, data.password], cb);
 };
 
 exports.searchUserBySkill = (cond, cb) => {
