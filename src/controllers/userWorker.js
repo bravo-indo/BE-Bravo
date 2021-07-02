@@ -1,5 +1,5 @@
 const {response} = require("../helpers/standarResponse");
-const userModel = require("../models/user");
+const userModel = require("../models/users");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
