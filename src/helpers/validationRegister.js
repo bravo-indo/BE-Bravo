@@ -13,7 +13,7 @@ module.exports = {
 			},
 		},
 	},
-  phone_number: {
+	phone_number: {
 		isLength: {
 			errorMessage: " Format Phone number is wrong, number length must be greater than 10",
 			options: {
