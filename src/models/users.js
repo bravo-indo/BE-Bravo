@@ -30,7 +30,7 @@ exports.getUserWorkerByEmail = (email, cb) => {
 
 exports.getUserWorkerDetail = (id, cb) => {
 	connection.query(
-		`SELECT *
+		`SELECT ${table}.id, ${table}.images, ${table}.name, ${table}.type_users, skills.name as skills, ${table}.job_desk, ${table}.address, ${table}.working_time,${table}.phone_number, ${table}.gender, ${table}.position, ${table}.description,${table}.company_name, ${table}.email, ${table}.instagram, ${table}.github, ${table}.gitlab 
     FROM ${table}
     LEFT JOIN skills ON ${table}.id = skills.id_user
     WHERE ${table}.id= ?`,
