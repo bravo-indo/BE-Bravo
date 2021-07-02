@@ -5,6 +5,7 @@ const {validationResult} = require("express-validator");
 const jwt = require("jsonwebtoken");
 const { APP_SECRET_KEY} = process.env;
 const nodemailer = require("nodemailer");
+const timeHelper = require("../helpers/date");
 
 exports.registerRecruiter = async (req, res) => {
 	const errors = validationResult(req);
@@ -185,4 +186,38 @@ exports.resetPassword = async (req, res) => {
 		}
 	}
 
+};
+
+const userPicture = require("../helpers/upload").single("images");
+
+exports.updateUserProfileRecruiter = (req, res) => {
+	userModel.getUserWorkerById(req.authUser.id, (err, results) => {
+		if(err){
+			return response(res, 402, false, "You dont have permission to accsess this resource");
+		}else{
+			if(results.length <= 0){
+				return response(res, 402, false, "Ann Error Occured");
+			}else{
+				userPicture(req, res, err =>{
+					if(err){
+						console.log(err);
+						return response(res, 402, false, "Ann Error Occured on uploads image");
+					}else{
+						req.body.images = req.file ? `${process.env.APP_UPLOAD_ROUTE}/${req.file.filename}` : null;
+						const {images, company_name, company_field, address, description, email, instagram, phone_number, linked_in, updated_time} = req.body;
+						const data = { id: req.authUser.id, images, company_name, company_field, address, description, email, instagram, phone_number, linked_in, updated_time: timeHelper.date()};
+						userModel.UpdateUserRecruiter(data, (err, results) => {
+							if (err) {
+								console.log(err);
+								return response(res, 500, false, "an Error accurred");
+							} else {
+								console.log(req.body);
+								return response(res, 200, true, "Profile Updated Sucsessfully", data);
+							}
+						});
+					}
+				});
+			}
+		}
+	});
 };

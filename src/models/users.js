@@ -110,3 +110,10 @@ exports.createTokenForgot = (data, cb) => {
 		`INSERT INTO ${tokenForgot} (token) VALUES (?)`, [data.token], cb);
 };
 
+
+exports.UpdateUserRecruiter = (data, cb) => {
+	connection.query(` 
+  UPDATE ${table} SET images=?, company_name=?, company_field=?, address=?, description=?, email=?, instagram=?, phone_number=?, linked_in=?, updated_time=?
+  WHERE id=?
+  `,[data.images, data.company_name, data.company_field, data.address, data.description, data.email, data.instagram, data.phone_number, data.linked_in, data.updated_time, data.id], cb);
+};
