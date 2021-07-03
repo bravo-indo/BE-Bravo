@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const { APP_SECRET_KEY} = process.env;
 const nodemailer = require("nodemailer");
 const timeHelper = require("../helpers/date");
+const { hireWorker } = require("../models/hire");
 
 exports.registerRecruiter = async (req, res) => {
 	const errors = validationResult(req);
@@ -221,3 +222,75 @@ exports.updateUserProfileRecruiter = (req, res) => {
 		}
 	});
 };
+
+exports.getDetailUserByIdParams = (req,res) => {
+  const { id: stringId } = req.params
+  const id = parseInt(stringId)
+    userModel.getUserWorkerById(req.authUser.id, (err, results) => {
+      if(err){
+        return response(res, 400, false, "You dont have permission to accsess this resource");
+      }else{
+        if(results[0].type_users === "recruiter"){
+          userModel.getUserWorkerDetail(id, (err, results) => {
+            if(err){
+              console.log(err);
+              return response(res, 400, false, "you don't have permission to accsess this resorce");
+            }else{
+              const users = results[0];
+              if (users.images !== null && !users.images.startsWith("http")) {
+                users.images = `${process.env.APP_URL}${users.images}`;
+              }
+              const data = {
+                id: 0,
+                name: "",
+                type_users: "",
+                job_desk: "",
+                address: "",
+                working_time: "",
+                description: "",
+                ...results[0],
+                skills: [],
+              };
+              results.forEach(point => {
+                data.skills.push({
+                  skillName : point.skills, 
+                });
+              });
+              return response(res, 200, true, "Detail Worker Profile", data);
+            }
+          });
+        }else{
+          return response(res, 400, false, "You must be login as Recruiter");
+        }
+      }
+    })
+}
+
+exports.postHiringUserWorker = (req, res) => {
+  const { id: stringId } = req.params
+  const id = parseInt(stringId)
+  userModel.getUserWorkerById(req.authUser.id, (err, results) => {
+    if(err){
+      return response(res, 400, false, "You dont have permission to accsess this resource");
+    }else{
+      if(results[0].type_users === "recruiter"){
+        const {project, name_recruiter, email_recruiter, phone_number_recruiter, desc_hire} = req.body
+        const data = { id_worker: id, id_recruiter : req.authUser.id, project, name_recruiter, email_recruiter, phone_number_recruiter, desc_hire}
+          hireWorker(data, (err, results) => {
+            if(err){
+              return response(res, 400, false, "An errors occured")
+            }else{
+              if (results.affectedRows) {
+                return response(res, 200, true, 'Hiring Worker succsessfully', data)
+              } else {
+                return response(res, 401, false, 'Failed toHiring Worker')
+              }
+            }
+          })
+      }else{
+        return response(res, 400, false, 'You Must be Login as Recruiter')
+      }
+    }
+  })
+};
+
