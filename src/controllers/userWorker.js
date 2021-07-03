@@ -75,11 +75,11 @@ exports.getListUserWorker = (req, res) => {
 	cond.page = cond.page || 1;
 	cond.offset = (cond.page - 1) * cond.limit;
 	userModel.getCountWorker(cond, (err, data) => {
+
 		const totalData = data[0].total_worker;
 		const lastPage = Math.ceil(totalData / cond.limit);
 		pageInfo.totalData = totalData;
 		pageInfo.currentPage = cond.page;
-
 		console.log("total data: ", totalData);
 		console.log(pageInfo);
 		console.log(cond.limit);
@@ -93,11 +93,36 @@ exports.getListUserWorker = (req, res) => {
 				`${APP_URL}/home?page=${cond.page - 1}` :
 				null;
 		userModel.getAllUserWorker(cond, id, (err, results) => {
+			const users = results[0];
 			if (!err) {
-				return response(res, 200, "List of Worker", results, pageInfo);
+				results.forEach((pic, index) => {
+					if (
+						results[index].images !== null &&
+						!results[index].images.startsWith('http')
+					) {
+						results[index].images = `${APP_URL}${results[index].images}`
+					}
+				})
+				const data = {
+					id: 0,
+					address: "",
+					working_time: "",
+					description: "",
+					...results[0],
+					skills: [],
+				};
+				results.forEach((x,point) => {
+					data.skills.push({
+						skillName: x.skills,
+					});
+					return data[x];
+				});
+				console.log(users);
+				console.log(results);
+				return response(res, 200, "List of Worker", data, pageInfo);
 			} else {
 				console.error(err);
-				return response(res, 500, "Ann Error Ooccured!");
+				return response(res, 500, "Ann Error Ooccured!", pageInfo);
 			}
 		});
 	});
