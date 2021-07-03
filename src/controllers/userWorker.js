@@ -3,7 +3,7 @@ const userModel = require("../models/users");
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
-const { APP_SECRET_KEY} = process.env;
+const { APP_SECRET_KEY, APP_URL} = process.env;
 
 
 exports.registerWorker = async (req, res) => {
@@ -37,7 +37,7 @@ exports.registerWorker = async (req, res) => {
 
 exports.LoginUserWorker = (req, res) => {
 	const {email, password} = req.body;
-	userModel.getUserWorkerByEmail(email, async (err, results) => {
+	userModel.getUserByEmail(email, async (err, results) => {
 		if(err){
 			console.log(err);
 			return response(res, 400, false, "Email not yet registered");
@@ -60,25 +60,49 @@ exports.LoginUserWorker = (req, res) => {
 };
 
 exports.getListUserWorker = (req, res) => {
-	userModel.getUserList((err, results) => {
-		if(err){
-			return response(res, 400, false, "an Error occurred");
-		}else{
-			return response(res, 400, true, "List of User Worker", results);
-		}
-	});
-};
+	const {id} = req.params;
+	const pageInfo = {};
+	const cond = req.query;
+	cond.search = cond.q || "";
+	cond.limit = cond.limit || 5;
+	cond.offset = cond.offset || 0;
+	cond.order = cond.sortBy || "Name_Worker";
+	cond.value = cond.value || "asc";
+	cond.page = cond.page || 1;
+	cond.offset = (cond.page - 1) * cond.limit;
+	userModel.getCountWorker(cond, (err, data) => {
+		const totalData = data[0].total_worker;
+		const lastPage = Math.ceil(totalData / cond.limit);
+		pageInfo.totalData = totalData;
+		pageInfo.currentPage = cond.page;
 
-exports.getUserBySkill = (req, res) => {
-	const cond = req.query.search || "";
-	userModel.searchUserBySkill(cond, (err, results) => {
-		if(err){
-			console.log(err);
-			return response(res, 400, false, "an error on search");
-		}else{
-			return response(res, 200, true, "list user", results);
-		}
-	}); 
+		console.log("total data: ", totalData);
+		console.log(pageInfo);
+		console.log(cond.limit);
+		pageInfo.lastPage = lastPage;
+		pageInfo.nextPage =
+			cond.page < lastPage ?
+				`${APP_URL}/user/search?page=${cond.page + 1}` :
+				null;
+		pageInfo.prevPage =
+			cond.page > 1 ?
+				`${APP_URL}/search?page=${cond.page - 1}` :
+				null;
+		userModel.getAllUserWorker(cond, id, (err, results) => {
+			if (!err) {
+				const data = {
+					skills: [],
+					...results
+				};
+
+				results.map(worker => (data.skills.push(worker.skills)));
+				return response(res, 200, "List of Worker", data, pageInfo);
+			} else {
+				console.error(err);
+				return response(res, 500, "Ann Error Ooccured!");
+			}
+		});
+	});
 };
 
 exports.getDetailUserWorker = (req, res) =>{

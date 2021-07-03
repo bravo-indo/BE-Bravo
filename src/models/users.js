@@ -6,19 +6,18 @@ const exp = "working_experience";
 // Worker
 exports.createUserWorker = (data, cb) => {
 	connection.query(
-		`INSERT INTO ${table} (name, email, phone_number, password)
-    VALUES(?, ?, ?, ?)`
-		, [data.name, data.email, data.phone_number, data.password], cb);
+		`INSERT INTO ${table} (role_users, type_users, name, email, phone_number, password)
+    VALUES(?, ?, ?, ?, ?, ?)`
+		, [data.role_users = "general", data.type_users = "worker", data.name, data.email, data.phone_number, data.password], cb);
 };
 
 exports.searchUserBySkill = (cond, cb) => {
 	connection.query(`
-	SELECT ${table}.id, ${table}.name, ${table}.address, ${table}.images, skills.name as skills, skills.id_user
+	SELECT ${table}.id, ${table}.name as Name_Worker, ${table}.address, ${table}.images, skills.name as skills, skills.id_user
 	FROM ${table}
 	LEFT JOIN skills ON ${table}.id = skills.id_user
-	WHERE skills.name LIKE '%${cond}%' 
-	GROUP BY NAME
-	`, [cond], cb);
+	WHERE skills.name LIKE '%${cond.search}%' 
+	ORDER BY ${cond.order} ${cond.value} LIMIT ${cond.limit} OFFSET ${cond.offset}`, [cond.search, cond.limit, cond.offset, cond.order, cond.value], cb);
 };
 
 exports.getUserWorkerDetail = (id, cb) => {
@@ -48,6 +47,15 @@ exports.getExperienceUser = (id, cb) => {
 	`, [id], cb);
 };
 
+exports.getAllUserWorker = ( cond, id, cb) => {
+	connection.query(`SELECT ${table}.id, ${table}.name as Name_Worker, ${table}.address, ${table}.images, skills.name as skills, skills.id_user
+	FROM ${table}
+	LEFT JOIN skills ON ${table}.id = skills.id_user
+	WHERE skills.name LIKE '%${cond.search}%' 
+	ORDER BY ${cond.order} ${cond.value} LIMIT ${cond.limit} OFFSET ${cond.offset}`, [cond.search, cond.limit, cond.offset, cond.order, cond.value, id], cb );
+};
+
+
 // Recruiter
 exports.createUserRecruiter = (data, cb) => {
 	connection.query(
@@ -72,3 +80,8 @@ exports.createTokenForgot = (data, cb) => {
 		`INSERT INTO ${tokenForgot} (token) VALUES (?)`, [data.token], cb);
 };
 
+exports.getCountWorker = (cond, cb) => {
+	connection.query(`Select count(${table}.id) as total_worker from ${table}
+		LEFT JOIN skills ON ${table}.id = skills.id_user
+		WHERE skills.name LIKE '%${cond.search}%'`, cb);
+};

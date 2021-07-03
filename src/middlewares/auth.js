@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const { APP_SECRET_KEY  } = process.env;
 
 const auth = (req, res, next) => {
-	if (req.headers?.authorization) {
+	if (req.headers.authorization) {
 		if (req.headers.authorization.startsWith("Bearer")) {
 			try {
 				const token = req.headers.authorization.slice(7);
