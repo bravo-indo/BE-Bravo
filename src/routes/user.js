@@ -16,6 +16,8 @@ route.get("/details", userController.getDetailUserWorker);
 // User recruiter bellow this line
 
 route.put("/recruiter/details/editprofile", userRecruiterController.updateUserProfileRecruiter);
+route.get("/recruiter/details/:id", userRecruiterController.getDetailUserByIdParams);
+route.post("/recruiter/details/:id", userRecruiterController.postHiringUserWorker);
 
 
 module.exports = route;

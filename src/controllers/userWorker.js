@@ -186,9 +186,13 @@ exports.patchUserWorkerSkills = (req, res) => {
         skillModel.addSkills(data, (err, results) => {
           if(err){
             console.log(err);
-            return response(res, 400, false, "Add New Skill Failed" );
+            return response(res, 400, false, "an errors occured" );
           }else{
-            return response(res, 200, true, "Add New Skills Successfully", data);
+            if (results.affectedRows) {
+              return response(res, 200, true, "Add New Skills Successfully", data);
+            } else {
+              return response(res, 401, false, 'Failed to Add New Skills')
+            }
           }
         });
       }else{
@@ -219,8 +223,11 @@ exports.postAddUserPortofolios = (req, res) => {
 								console.log(err);
 								return response(res, 500, false, "an Error accurred");
 							} else {
-								console.log(req.body);
-								return response(res, 200, true, "Portofolio Updated Sucsessfully", data);
+                if (results.affectedRows) {
+                  return response(res, 200, true, "Portofolio Updated Sucsessfully", data);
+                } else {
+                  return response(res, 401, false, 'Portofolio Updated Failed')
+                }
 							}
 						});
 					}
@@ -245,7 +252,11 @@ exports.postAddUserWorkerExperience = (req, res) => {
             console.log(err);
             return response(res, 400, false, "Add New Working Experience Failed" );
           }else{
-            return response(res, 200, true, "Add New Working Experience Successfully", data);
+            if (results.affectedRows) {
+              return response(res, 200, true, "Add New Working Experience Successfully", data);
+            } else {
+              response(res, 401, false, 'Failed to Add New  Working Experience')
+            }
           }
         });
       }else{
@@ -254,3 +265,4 @@ exports.postAddUserWorkerExperience = (req, res) => {
 		}
 	});
 };
+
