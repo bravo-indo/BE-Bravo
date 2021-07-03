@@ -3,7 +3,7 @@ const userModel = require("../models/users");
 const bcrypt = require("bcrypt");
 const {validationResult} = require("express-validator");
 const jwt = require("jsonwebtoken");
-const { APP_SECRET_KEY} = process.env;
+const { APP_SECRET_KEY, APP_URL} = process.env;
 const nodemailer = require("nodemailer");
 const timeHelper = require("../helpers/date");
 const { hireWorker } = require("../models/hire");
@@ -189,6 +189,68 @@ exports.resetPassword = async (req, res) => {
 
 };
 
+exports.getSearchBySkill = (req, res) => {
+	const cond = req.query;
+	cond.search = cond.q || "";
+	cond.limit = cond.limit || 5;
+	cond.offset = cond.offset || 0;
+	cond.order = cond.sortBy || "Name_Worker";
+	cond.value = cond.value || "asc";
+	cond.page = cond.page || 1;
+	cond.offset = (cond.page - 1) * cond.limit;
+	const pageInfo = {};
+
+	if(cond.order === "fulltime") {
+		cond.order = "working_time";
+	}
+	else if(cond.order === "freelancer") {
+		cond.order = "working_time";
+	}
+	userModel.getCountWorker(cond, (err, data) => {
+		const totalData = data[0].total_worker;
+		const lastPage = Math.ceil(totalData / cond.limit);
+		pageInfo.totalData = totalData;
+		pageInfo.currentPage = cond.page;
+
+		console.log("total data: ",totalData);
+		console.log(pageInfo);
+		console.log(cond.limit);
+		pageInfo.lastPage = lastPage;
+		pageInfo.nextPage =
+		cond.page < lastPage ?
+			`${APP_URL}/user/search?page=${cond.page + 1}` :
+			null;
+		pageInfo.prevPage =
+		cond.page > 1 ?
+			`${APP_URL}/search?page=${cond.page - 1}` :
+			null;
+		userModel.searchUserBySkill(cond, (err, results) => {
+			if (!err) {
+				if (results.length > 0) {
+				// const data = {
+				// 	skills: [],
+				// 	...results
+				// };
+				// results.forEach(worker => {
+				// 	data.skills.push({
+				// 		id: worker.id,
+				// 		name: worker.skills
+				// 	});
+				// 	console.log(data.skills);
+				// });
+				// console.log(results);
+					return response(res, 200, "List of Worker", results, pageInfo);
+				} else {
+					return response(res, 404, "Worker not Found!", pageInfo);
+				}
+			} else {
+				console.error(err);
+				return response(res, 500, "Ann Error Ooccured!", pageInfo);
+			}
+		});
+	});
+};
+
 const userPicture = require("../helpers/upload").single("images");
 
 exports.updateUserProfileRecruiter = (req, res) => {
@@ -293,4 +355,3 @@ exports.postHiringUserWorker = (req, res) => {
     }
   })
 };
-

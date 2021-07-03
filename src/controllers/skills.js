@@ -2,7 +2,7 @@ const skillsModel = require("../models/skills");
 const {response } = require("../helpers/standarResponse");
 
 exports.getSkills = (req, res) => {
-	skillsModel.getVariants((err, results) => {
+	skillsModel.getSkills((err, results) => {
 		if (!err) {
 			return response(res, 200, "List of skills", results);
 		} else {
@@ -12,7 +12,7 @@ exports.getSkills = (req, res) => {
 };
 
 exports.addSkills = (req, res) => {
-	skillsModel.addVariants(req.body, (err) => {
+	skillsModel.addSkills(req.body, (err) => {
 		if (!err) {
 			return response(res, 200, "Create skills has been successfully!");
 		} else {
