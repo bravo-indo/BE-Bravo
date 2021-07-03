@@ -20,9 +20,16 @@ exports.searchUserBySkill = (cond, cb) => {
 	ORDER BY ${cond.order} ${cond.value} LIMIT ${cond.limit} OFFSET ${cond.offset}`, [cond.search, cond.limit, cond.offset, cond.order, cond.value], cb);
 };
 
+exports.getUserWorkerByEmail = (email, cb) => {
+	connection.query(
+		`SELECT id, name, email, password FROM ${table}
+  WHERE email= ?`,
+		[email], cb);
+};
+
 exports.getUserWorkerDetail = (id, cb) => {
 	connection.query(
-		`SELECT ${table}.id, ${table}.images, ${table}.name, ${table}.job_desk, ${table}.address, ${table}.working_time, ${table}.description, skills.name as skills, ${table}.instagram, ${table}.github, ${table}.gitlab
+		`SELECT ${table}.id, ${table}.images, ${table}.name, ${table}.type_users, skills.name as skills, ${table}.job_desk, ${table}.address, ${table}.working_time,${table}.phone_number, ${table}.gender, ${table}.position, ${table}.description,${table}.company_name, ${table}.email, ${table}.instagram, ${table}.github, ${table}.gitlab 
     FROM ${table}
     LEFT JOIN skills ON ${table}.id = skills.id_user
     WHERE ${table}.id= ?`,
@@ -31,7 +38,7 @@ exports.getUserWorkerDetail = (id, cb) => {
 
 exports.getPortoFolioUser = (id, cb) => {
 	connection.query(`
-	SELECT ${table}.id as user_id, portofolios.id, portofolios.portofolio_file as portofolios
+	SELECT ${table}.id as user_id, portofolios.id, portofolios.project_name, portofolios.type_project, portofolios.portofolio_file as portofolios
 	FROM ${table}
 	LEFT JOIN portofolios ON ${table}.id = portofolios.id_user
 	WHERE ${table}.id= ?
@@ -40,7 +47,7 @@ exports.getPortoFolioUser = (id, cb) => {
 
 exports.getExperienceUser = (id, cb) => {
 	connection.query(`
-	SELECT ${table}.id as user_id, ${exp}.id, ${exp}.company_name, ${exp}.position, ${exp}.years, ${exp}.description
+	SELECT ${table}.id as user_id, ${exp}.id, ${exp}.company_name, ${exp}.position, ${exp}.month_years, ${exp}.description
 	FROM ${table}
 	LEFT JOIN ${exp} ON ${table}.id = ${exp}.id_user
 	WHERE ${table}.id=?
@@ -55,6 +62,36 @@ exports.getAllUserWorker = ( cond, id, cb) => {
 	ORDER BY ${cond.order} ${cond.value} LIMIT ${cond.limit} OFFSET ${cond.offset}`, [cond.search, cond.limit, cond.offset, cond.order, cond.value, id], cb );
 };
 
+exports.getUserWorkerById = (id, cb) =>{
+	connection.query(`
+  SELECT id, name, images, type_users, job_desk, address, company_name, description
+  FROM ${table}
+  WHERE id=?
+  `,[id], cb);
+};
+
+
+exports.UpdateUserWorker = (data, cb) => {
+	connection.query(` 
+  UPDATE ${table} SET name=?, images=?, job_desk=?, address=?, company_name=?, description=?, updated_time=?
+  WHERE id=?
+  `,[data.name, data.images, data.job_desk, data.address, data.company_name, data.description, data.updated_time, data.id], cb);
+};
+
+const porto = "portofolios"
+exports.postUserWorkerPortofolio = (data, cb) => {
+  connection.query(`
+  INSERT INTO ${porto} ( id_user, project_name, repository, type_project, portofolio_file)
+  VALUES(?, ?, ?, ?, ?)
+  `, [data.id_user, data.project_name, data.repository, data.type_project, data.portofolio_file], cb)
+}
+
+exports.postUserWorkerExperience= (data, cb) => {
+  connection.query(`
+  INSERT INTO ${exp} ( id_user, company_name, position, month_years, description)
+  VALUES(?, ?, ?, ?, ?)
+  `, [data.id_user, data.company_name, data.position, data.month_years, data.description], cb)
+}
 
 // Recruiter
 exports.createUserRecruiter = (data, cb) => {
@@ -85,3 +122,11 @@ exports.getCountWorker = (cond, cb) => {
 		LEFT JOIN skills ON ${table}.id = skills.id_user
 		WHERE skills.name LIKE '%${cond.search}%'`, cb);
 };
+
+exports.UpdateUserRecruiter = (data, cb) => {
+	connection.query(` 
+  UPDATE ${table} SET images=?, company_name=?, company_field=?, address=?, description=?, email=?, instagram=?, phone_number=?, linked_in=?, updated_time=?
+  WHERE id=?
+  `,[data.images, data.company_name, data.company_field, data.address, data.description, data.email, data.instagram, data.phone_number, data.linked_in, data.updated_time, data.id], cb);
+};
+

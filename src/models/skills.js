@@ -7,5 +7,5 @@ exports.getSkills = (cb) => {
 };
 
 exports.addSkills = (data, cb) => {
-	connection.query(`insert into ${table} (name, id_user) values (?,?)`, [data.name, data.code], cb);
+	connection.query(`insert into ${table} (name, id_user) values (?,?)`, [data.name, data.id_user], cb);
 };
