@@ -86,21 +86,15 @@ exports.getListUserWorker = (req, res) => {
 		pageInfo.lastPage = lastPage;
 		pageInfo.nextPage =
 			cond.page < lastPage ?
-				`${APP_URL}/user/search?page=${cond.page + 1}` :
+				`${APP_URL}/home?page=${cond.page + 1}` :
 				null;
 		pageInfo.prevPage =
 			cond.page > 1 ?
-				`${APP_URL}/search?page=${cond.page - 1}` :
+				`${APP_URL}/home?page=${cond.page - 1}` :
 				null;
 		userModel.getAllUserWorker(cond, id, (err, results) => {
 			if (!err) {
-				const data = {
-					skills: [],
-					...results
-				};
-
-				results.map(worker => (data.skills.push(worker.skills)));
-				return response(res, 200, "List of Worker", data, pageInfo);
+				return response(res, 200, "List of Worker", results, pageInfo);
 			} else {
 				console.error(err);
 				return response(res, 500, "Ann Error Ooccured!");
