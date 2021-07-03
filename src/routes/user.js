@@ -11,6 +11,7 @@ route.patch("/details/editprofile", userController.patchUserWorkerSkills);
 route.post("/details/editprofile", userController.postAddUserPortofolios);
 route.post("/details/editprofile/experienceWork", userController.postAddUserWorkerExperience);
 route.get("/details", userController.getDetailUserWorker);
+route.get("/notifikasi", userController.getUserNotifikasiHiring);
 // route.get("/", userController.getUserBySkill);
 
 // User recruiter bellow this line

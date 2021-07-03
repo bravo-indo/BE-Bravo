@@ -269,17 +269,28 @@ exports.getDetailUserByIdParams = (req,res) => {
 exports.postHiringUserWorker = (req, res) => {
   const { id: stringId } = req.params
   const id = parseInt(stringId)
-	const {project, name_recruiter, email_recruiter, phone_number_recruiter, desc_hire} = req.body
-  const data = { id_worker: id, id_recruiter : req.authUser.id, project, name_recruiter, email_recruiter, phone_number_recruiter, desc_hire}
-	  hireWorker(data, (err, results) => {
-      if(err){
-        return response(res, 400, false, "An errors occured")
+  userModel.getUserWorkerById(req.authUser.id, (err, results) => {
+    if(err){
+      return response(res, 400, false, "You dont have permission to accsess this resource");
+    }else{
+      if(results[0].type_users === "recruiter"){
+        const {project, name_recruiter, email_recruiter, phone_number_recruiter, desc_hire} = req.body
+        const data = { id_worker: id, id_recruiter : req.authUser.id, project, name_recruiter, email_recruiter, phone_number_recruiter, desc_hire}
+          hireWorker(data, (err, results) => {
+            if(err){
+              return response(res, 400, false, "An errors occured")
+            }else{
+              if (results.affectedRows) {
+                return response(res, 200, true, 'Hiring Worker succsessfully', data)
+              } else {
+                return response(res, 401, false, 'Failed toHiring Worker')
+              }
+            }
+          })
       }else{
-        if (results.affectedRows) {
-          response(res, 200, true, 'Hiring Worker succsessfully', data)
-        } else {
-          response(res, 401, false, 'Failed toHiring Worker')
-        }
+        return response(res, 400, false, 'You Must be Login as Recruiter')
       }
-    })
+    }
+  })
 };
+

@@ -1,6 +1,7 @@
 const {response} = require("../helpers/standarResponse");
 const userModel = require("../models/users");
 const skillModel = require("../models/skills");
+const hireModel = require("../models/hire")
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
@@ -196,7 +197,7 @@ exports.patchUserWorkerSkills = (req, res) => {
           }
         });
       }else{
-        return response(res, 400, false, "You dont have permission to accsess this resource");
+        return response(res, 400, false, "You Must be Login as Worker to access this resource");
       }
 		}
 	});
@@ -233,7 +234,7 @@ exports.postAddUserPortofolios = (req, res) => {
 					}
 				});
       }else{
-        return response(res, 400, false, "You dont have permission to accsess this resource");
+        return response(res, 400, false, "You Must be Login as Worker to access this resource");
       }
 		}
 	}); 
@@ -260,9 +261,32 @@ exports.postAddUserWorkerExperience = (req, res) => {
           }
         });
       }else{
-        return response(res, 400, false, "You dont have permission to accsess this resource");
+        return response(res, 400, false, "You Must be Login as Worker to access this resource");
       }
 		}
 	});
 };
 
+exports.getUserNotifikasiHiring = (req, res) => {
+  userModel.getUserWorkerById(req.authUser.id, (err, results) => {
+    if(err){
+			return response(res, 400, false, "You dont have permission to accsess this resource");
+		}else{
+      if(results[0].type_users === "worker"){
+        hireModel.getNotifikasiHiring(req.authUser.id, (err, results) => {
+          if(err){
+            return response(res, 400, false, "an Error Occured")
+          }else{
+            if(results.length <= 0){
+             return response(res, 400, false, "You dont have Hiring Request")
+            }else{
+              return response(res, 200, true, "Your List Request Hiring From Recruiter", results);
+            }
+          }
+        })
+      }else{
+        return response(res, 400, false, "You Must be Login as Worker to access this resource")
+      }
+    }
+  }) 
+}

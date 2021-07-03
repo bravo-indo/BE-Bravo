@@ -39,7 +39,7 @@ exports.getUserWorkerDetail = (id, cb) => {
 
 exports.getPortoFolioUser = (id, cb) => {
 	connection.query(`
-	SELECT ${table}.id as user_id, portofolios.id, portofolios.portofolio_file as portofolios
+	SELECT ${table}.id as user_id, portofolios.id, portofolios.project_name, portofolios.type_project, portofolios.portofolio_file as portofolios
 	FROM ${table}
 	LEFT JOIN portofolios ON ${table}.id = portofolios.id_user
 	WHERE ${table}.id= ?
@@ -117,3 +117,4 @@ exports.UpdateUserRecruiter = (data, cb) => {
   WHERE id=?
   `,[data.images, data.company_name, data.company_field, data.address, data.description, data.email, data.instagram, data.phone_number, data.linked_in, data.updated_time, data.id], cb);
 };
+
