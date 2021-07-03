@@ -230,7 +230,6 @@ exports.getDetailUserByIdParams = (req,res) => {
       if(err){
         return response(res, 400, false, "You dont have permission to accsess this resource");
       }else{
-        if(results[0].type_users === "recruiter"){
           userModel.getUserWorkerDetail(id, (err, results) => {
             if(err){
               console.log(err);
@@ -259,9 +258,6 @@ exports.getDetailUserByIdParams = (req,res) => {
               return response(res, 200, true, "Detail Worker Profile", data);
             }
           });
-        }else{
-          return response(res, 400, false, "You must be login as Recruiter");
-        }
       }
     })
 }
