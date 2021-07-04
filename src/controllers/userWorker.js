@@ -222,10 +222,10 @@ const userPicture = require("../helpers/upload").single("images");
 exports.updateUserProfile = (req, res) => {
 	userModel.getUserWorkerById(req.authUser.id, (err, results) => {
 		if(err){
-			return response(res, 402, false, "You dont have permission to accsess this resource");
+			return response(res, 402, false, "Ann Error Occured");
 		}else{
 			if(results.length <= 0){
-				return response(res, 402, false, "Ann Error Occured");
+				return response(res, 402, false, "You dont have permission to accsess this resource");
 			}else{
 				userPicture(req, res, err =>{
 					if(err){
@@ -253,7 +253,7 @@ exports.updateUserProfile = (req, res) => {
 
 
 
-exports.patchUserWorkerSkills = (req, res) => {
+exports.postUserWorkerSkills = (req, res) => {
 	const {name} = req.body
   const data = {name, id_user : req.authUser.id}
 	userModel.getUserWorkerById(req.authUser.id, (err, results) => {
