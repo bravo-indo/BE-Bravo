@@ -92,39 +92,47 @@ exports.getListUserWorker = (req, res) => {
 			cond.page > 1 ?
 				`${APP_URL}/home?page=${cond.page - 1}` :
 				null;
-		userModel.getAllUserWorker(cond, id, (err, results) => {
-			const users = results[0];
-			if (!err) {
-				results.forEach((pic, index) => {
-					if (
-						results[index].images !== null &&
-						!results[index].images.startsWith('http')
-					) {
-						results[index].images = `${APP_URL}${results[index].images}`
-					}
-				})
-				const data = {
-					id: 0,
-					address: "",
-					working_time: "",
-					description: "",
-					...results[0],
-					skills: [],
-				};
-				results.forEach((x,point) => {
-					data.skills.push({
-						skillName: x.skills,
-					});
-					return data[x];
-				});
-				console.log(users);
-				console.log(results);
-				return response(res, 200, "List of Worker", data, pageInfo);
-			} else {
-				console.error(err);
-				return response(res, 500, "Ann Error Ooccured!", pageInfo);
-			}
-		});
+
+			userModel.getUserFromSkill(data, (err, results) => {
+				if(!err) {
+					return response(res, 200, "List of Worker", results, pageInfo);
+				}
+				else {
+					return response(res, 500, "An Error occured", pageInfo);
+				}
+			});
+		// userModel.getAllUserWorker(cond, id, (err, results) => {
+		// 	// const users = results[0];
+		// 	if (!err) {
+		// 		results.forEach((pic, index) => {
+		// 			if (
+		// 				results[index].images !== null &&
+		// 				!results[index].images.startsWith('http')
+		// 			) {
+		// 				results[index].images = `${APP_URL}${results[index].images}`
+		// 			}
+		// 		})
+		// 		// const data = {
+		// 		// 	id: null,
+		// 		// 	address: "",
+		// 		// 	working_time: "",
+		// 		// 	description: "",
+		// 		// 	...results[0],
+		// 		// 	skills: [],
+		// 		// };
+		// 		// results.forEach((x) => {
+		// 		// 	data.skills.push({
+		// 		// 		skillName: x.skills,
+		// 		// 	});
+		// 		// });
+		// 		// console.log(users);
+		// 		// console.log(results);
+		// 		return response(res, 200, "List of Worker", results, pageInfo);
+		// 	} else {
+		// 		console.error(err);
+		// 		return response(res, 500, "Ann Error Ooccured!", pageInfo);
+		// 	}
+		// });
 	});
 };
 
@@ -153,6 +161,7 @@ exports.getDetailUserWorker = (req, res) =>{
 				data.skills.push({
 					skillName : point.skills, 
 				});
+				data[point]
 			});
 			return response(res, 200, true, "Your Profile", data);
 		}
