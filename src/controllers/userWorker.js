@@ -44,7 +44,7 @@ exports.LoginUserWorker = (req, res) => {
 	userModel.getUserByEmail(email, async (err, results) => {
 		if(err){
 			console.log(err);
-			return response(res, 400, false, "Email not yet registered");
+			return response(res, 400, false, "An Error Occured");
 		}else{
 			if(results.length < 1){
 				return response(res, 400, false, "Wrong Email or Password !");
@@ -174,6 +174,37 @@ exports.getPortofolioByUser = (req, res) => {
 	});
 };
 
+exports.getPortofolioByUserIdParams = (req, res) => {
+  const { id: stringId } = req.params
+  const id = parseInt(stringId)
+	userModel.getPortoFolioUser(id, (err, results) => {
+		if(results.length <= 0){
+			return response(res, 400, false, "You dont have permission to access this resource");
+		}else{
+      results.forEach(data => {   
+      if (data.portofolios !== null && !data.portofolios.startsWith("http")) {
+				data.portofolios = `${process.env.APP_URL}${data.portofolios}`;
+			}
+      })
+			return response(res, 200, true, "List Your Portofolio", results);
+		}
+	});
+};
+
+
+exports.getExperienceByUserIdParams = (req, res) => {
+  const { id: stringId } = req.params
+  const id = parseInt(stringId)
+	userModel.getExperienceUser(id, (err, results) => {
+		if(results.length <= 0){
+			return response(res, 400, false, "You dont have permission to access this resource");
+		}else{
+			return response(res, 200, true, "List Your experience", results);
+		}
+	});
+};
+
+
 exports.getExperienceByUser = (req, res) => {
 	userModel.getExperienceUser(req.authUser.id, (err, results) => {
 		if(results.length <= 0){
@@ -183,6 +214,8 @@ exports.getExperienceByUser = (req, res) => {
 		}
 	});
 };
+
+
 
 const userPicture = require("../helpers/upload").single("images");
 

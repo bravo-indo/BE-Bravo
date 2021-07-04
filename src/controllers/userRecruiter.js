@@ -290,7 +290,8 @@ exports.getDetailUserByIdParams = (req,res) => {
   const id = parseInt(stringId)
     userModel.getUserWorkerById(req.authUser.id, (err, results) => {
       if(err){
-        return response(res, 400, false, "You dont have permission to accsess this resource");
+        console.log();
+        return response(res, 400, false, "an errors occured");
       }else{
           userModel.getUserWorkerDetail(id, (err, results) => {
             if(err){
