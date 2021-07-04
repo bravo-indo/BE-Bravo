@@ -20,14 +20,14 @@ exports.registerWorker = async (req, res) => {
 			userModel.createUserWorker(data, (err, results) => {
 				if(err){
 					console.log(err);
-					return response(res, 400, false, "Register Failed");
+					return response(res, 400, false, "ann erorr ocured");
 				}else{
 					if(results.affectedRows){
 						console.log(data);
 						return response(res, 200, true, "Register Successfully");
 					}else{
 						console.log(err);
-						return response(res, 400, false, "ann erorr ocured");
+						return response(res, 400, false, "Register Failed");
 					}
 				}
 			});
