@@ -95,6 +95,14 @@ exports.getListUserWorker = (req, res) => {
 
 			userModel.getUserFromSkill(data, (err, results) => {
 				if(!err) {
+					results.forEach((pic, index) => {
+						if (
+							results[index].images !== null &&
+							!results[index].images.startsWith("http")
+						) {
+							results[index].images = `${APP_URL}${results[index].images}`
+						}
+					})
 					return response(res, 200, "List of Worker", results, pageInfo);
 				}
 				else {
