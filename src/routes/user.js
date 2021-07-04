@@ -2,7 +2,7 @@
 
 const route = require("express").Router();
 const userController = require("../controllers/userWorker");
-const userRecruiterController = require("../controllers/userRecruiter")
+const userRecruiterController = require("../controllers/userRecruiter");
 
 route.get("/details/portofolio", userController.getPortofolioByUser);
 route.get("/details/experience", userController.getExperienceByUser);
@@ -13,6 +13,9 @@ route.post("/details/editprofile/experienceWork", userController.postAddUserWork
 route.get("/details", userController.getDetailUserWorker);
 route.get("/notifikasi", userController.getUserNotifikasiHiring);
 // route.get("/", userController.getUserBySkill);
+
+// Recruiter
+route.get("/search", userRecruiterController.getSearchBySkill);
 
 // User recruiter bellow this line
 

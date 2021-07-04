@@ -5,8 +5,9 @@ const hireModel = require("../models/hire")
 const bcrypt = require("bcrypt");
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const { APP_SECRET_KEY, APP_URL} = process.env;
 const timeHelper = require("../helpers/date");
-const { APP_SECRET_KEY} = process.env;
+
 
 
 exports.registerWorker = async (req, res) => {
@@ -40,7 +41,7 @@ exports.registerWorker = async (req, res) => {
 
 exports.LoginUserWorker = (req, res) => {
 	const {email, password} = req.body;
-	userModel.getUserWorkerByEmail(email, async (err, results) => {
+	userModel.getUserByEmail(email, async (err, results) => {
 		if(err){
 			console.log(err);
 			return response(res, 400, false, "Email not yet registered");
@@ -63,25 +64,68 @@ exports.LoginUserWorker = (req, res) => {
 };
 
 exports.getListUserWorker = (req, res) => {
-	userModel.getUserList((err, results) => {
-		if(err){
-			return response(res, 400, false, "an Error occurred");
-		}else{
-			return response(res, 400, true, "List of User Worker", results);
-		}
-	});
-};
+	const {id} = req.params;
+	const pageInfo = {};
+	const cond = req.query;
+	cond.search = cond.q || "";
+	cond.limit = cond.limit || 5;
+	cond.offset = cond.offset || 0;
+	cond.order = cond.sortBy || "Name_Worker";
+	cond.value = cond.value || "asc";
+	cond.page = cond.page || 1;
+	cond.offset = (cond.page - 1) * cond.limit;
+	userModel.getCountWorker(cond, (err, data) => {
 
-exports.getUserBySkill = (req, res) => {
-	const cond = req.query.search || "";
-	userModel.searchUserBySkill(cond, (err, results) => {
-		if(err){
-			console.log(err);
-			return response(res, 400, false, "an error on search");
-		}else{
-			return response(res, 200, true, "list user", results);
-		}
-	}); 
+		const totalData = data[0].total_worker;
+		const lastPage = Math.ceil(totalData / cond.limit);
+		pageInfo.totalData = totalData;
+		pageInfo.currentPage = cond.page;
+		console.log("total data: ", totalData);
+		console.log(pageInfo);
+		console.log(cond.limit);
+		pageInfo.lastPage = lastPage;
+		pageInfo.nextPage =
+			cond.page < lastPage ?
+				`${APP_URL}/home?page=${cond.page + 1}` :
+				null;
+		pageInfo.prevPage =
+			cond.page > 1 ?
+				`${APP_URL}/home?page=${cond.page - 1}` :
+				null;
+		userModel.getAllUserWorker(cond, id, (err, results) => {
+			const users = results[0];
+			if (!err) {
+				results.forEach((pic, index) => {
+					if (
+						results[index].images !== null &&
+						!results[index].images.startsWith('http')
+					) {
+						results[index].images = `${APP_URL}${results[index].images}`
+					}
+				})
+				const data = {
+					id: 0,
+					address: "",
+					working_time: "",
+					description: "",
+					...results[0],
+					skills: [],
+				};
+				results.forEach((x,point) => {
+					data.skills.push({
+						skillName: x.skills,
+					});
+					return data[x];
+				});
+				console.log(users);
+				console.log(results);
+				return response(res, 200, "List of Worker", data, pageInfo);
+			} else {
+				console.error(err);
+				return response(res, 500, "Ann Error Ooccured!", pageInfo);
+			}
+		});
+	});
 };
 
 exports.getDetailUserWorker = (req, res) =>{
