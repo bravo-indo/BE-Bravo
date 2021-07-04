@@ -290,9 +290,9 @@ exports.getDetailUserByIdParams = (req,res) => {
   const id = parseInt(stringId)
     userModel.getUserWorkerById(req.authUser.id, (err, results) => {
       if(err){
-        return response(res, 400, false, "You dont have permission to accsess this resource");
+        console.log();
+        return response(res, 400, false, "an errors occured");
       }else{
-        if(results[0].type_users === "recruiter"){
           userModel.getUserWorkerDetail(id, (err, results) => {
             if(err){
               console.log(err);
@@ -321,9 +321,6 @@ exports.getDetailUserByIdParams = (req,res) => {
               return response(res, 200, true, "Detail Worker Profile", data);
             }
           });
-        }else{
-          return response(res, 400, false, "You must be login as Recruiter");
-        }
       }
     })
 }
