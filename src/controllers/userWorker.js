@@ -258,7 +258,7 @@ exports.postUserWorkerSkills = (req, res) => {
   const data = {name, id_user : req.authUser.id}
 	userModel.getUserWorkerById(req.authUser.id, (err, results) => {
 		if(err){
-			return response(res, 400, false, "You dont have permission to accsess this resource");
+			return response(res, 400, false, "an errors occured");
 		}else{
       if(results[0].type_users === "worker"){
         skillModel.addSkills(data, (err, results) => {
@@ -267,7 +267,7 @@ exports.postUserWorkerSkills = (req, res) => {
             return response(res, 400, false, "an errors occured" );
           }else{
             if (results.affectedRows) {
-              return response(res, 200, true, "Add New Skills Successfully", data);
+              return response(res, 200, true,"Add New Skills Successfully",data);
             } else {
               return response(res, 401, false, 'Failed to Add New Skills')
             }
@@ -285,7 +285,7 @@ const portoFile = require("../helpers/upload").single("portofolio_file")
 exports.postAddUserPortofolios = (req, res) => {
 	userModel.getUserWorkerById(req.authUser.id, (err, results) => {
 		if(err){
-			return response(res, 400, false, "You dont have permission to accsess this resource");
+			return response(res, 400, false, "Ann Error Occured");
 		}else{
       if(results[0].type_users === "worker"){
         portoFile(req, res, err =>{
@@ -355,7 +355,7 @@ exports.getUserNotifikasiHiring = (req, res) => {
             return response(res, 400, false, "an Error Occured")
           }else{
             if(results.length <= 0){
-             return response(res, 400, false, "You dont have Hiring Request")
+             return response(res, 400, false, "Get List Notifikasi Failed")
             }else{
               return response(res, 200, true, "Your List Request Hiring From Recruiter", results);
             }
