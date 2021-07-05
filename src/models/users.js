@@ -130,6 +130,11 @@ exports.UpdateUserRecruiter = (data, cb) => {
   `,[data.images, data.company_name, data.company_field, data.address, data.description, data.email, data.instagram, data.phone_number, data.linked_in, data.updated_time, data.id], cb);
 };
 
-exports.getUserFromSkill = (data, cb) => {
-	connection.query(`SELECT users.id, users.name as Name_Worker, users.address, users.images FROM users WHERE users.type_users = 'worker' OR users.id in(select skills.id_user FROM skills)`, [data], cb)
+exports.getUserFromSkill = (cond, cb) => {
+	connection.query(`SELECT users.id, users.name as Name_Worker, users.address, users.images FROM users WHERE users.type_users = 'worker' OR users.id in(select skills.id_user FROM skills) LIMIT ${cond.limit} OFFSET ${cond.offset}`, [cond.limit, cond.offset], cb)
 };
+
+exports.getCountUserAllWorker = (cond, cb) => {
+	connection.query(`Select count(users.id) as total_worker from users
+ WHERE users.type_users = 'worker' OR users.id in (select skills.id_user FROM skills)`, [cond], cb)
+}

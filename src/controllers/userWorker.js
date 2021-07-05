@@ -70,18 +70,15 @@ exports.getListUserWorker = (req, res) => {
 	cond.search = cond.q || "";
 	cond.limit = cond.limit || 5;
 	cond.offset = cond.offset || 0;
-	cond.order = cond.sortBy || "Name_Worker";
-	cond.value = cond.value || "asc";
 	cond.page = cond.page || 1;
 	cond.offset = (cond.page - 1) * cond.limit;
-	userModel.getCountWorker(cond, (err, data) => {
-
+	userModel.getCountUserAllWorker(cond, (err, data) => {
 		const totalData = data[0].total_worker;
 		const lastPage = Math.ceil(totalData / cond.limit);
 		pageInfo.totalData = totalData;
 		pageInfo.currentPage = cond.page;
 		console.log("total data: ", totalData);
-		console.log(pageInfo);
+		console.log("page info: ",pageInfo);
 		console.log(cond.limit);
 		pageInfo.lastPage = lastPage;
 		pageInfo.nextPage =
@@ -93,7 +90,7 @@ exports.getListUserWorker = (req, res) => {
 				`${APP_URL}/home?page=${cond.page - 1}` :
 				null;
 
-			userModel.getUserFromSkill(data, (err, results) => {
+			userModel.getUserFromSkill(cond, (err, results) => {
 				if(!err) {
 					results.forEach((pic, index) => {
 						if (
